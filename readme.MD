@@ -2,7 +2,7 @@
 
 REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fiber, GORM, dan PostgreSQL dengan clean architecture pattern.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -20,7 +20,7 @@ REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fibe
 - [Contributing](#contributing)
 - [License](#license)
 
-## ✨ Features
+## Features
 
 - ✅ **JWT Authentication** - Secure token-based authentication
 - ✅ **GORM ORM** - Auto migration, soft delete, associations
@@ -38,7 +38,7 @@ REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fibe
 - ✅ **Logging** - Request/Response logging middleware
 - ✅ **Recovery** - Panic recovery middleware
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Go** 1.25.1 - Programming language
 - **Fiber** v2.52.0 - Web framework
@@ -48,7 +48,7 @@ REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fibe
 - **Bcrypt** - Password hashing
 - **GoDotEnv** - Environment variable management
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 go-rest-api/
@@ -81,16 +81,17 @@ go-rest-api/
 │   ├── routes/
 │   │   └── routes.go               # Route definitions
 │   └── utils/
+│       ├── errors.go               # List of errors used in response.go
 │       ├── jwt.go                  # JWT utilities
 │       ├── password.go             # Password hashing utilities
 │       └── response.go             # Response formatting utilities
-├── .env.example                     # Environment variables template
-├── .gitignore                       # Git ignore rules
-├── go.mod                           # Go module dependencies
-└── README.md                        # Project documentation
+├── .env.example                    # Environment variables template
+├── .gitignore                      # Git ignore rules
+├── go.mod                          # Go module dependencies
+└── README.md                       # Project documentation
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
 Sebelum memulai, pastikan Anda telah menginstal:
 
@@ -99,7 +100,7 @@ Sebelum memulai, pastikan Anda telah menginstal:
 - **Git** ([Download](https://git-scm.com/downloads))
 - **Text Editor/IDE** (VS Code, GoLand, dll)
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone Repository
 
@@ -136,7 +137,7 @@ CREATE DATABASE go_rest_api;
 \q
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### 1. Create Environment File
 
@@ -173,7 +174,7 @@ JWT_EXPIRE_MINUTES=1440
 - Ganti `JWT_SECRET` dengan key yang aman untuk production
 - Jangan commit file `.env` ke repository
 
-## 🏃 Running the Application
+## Running the Application
 
 ### Development Mode
 
@@ -206,7 +207,7 @@ GOOS=darwin GOARCH=amd64 go build -o bin/api-macos cmd/api/main.go
 
 Server akan berjalan di: `http://localhost:8080`
 
-## 📚 API Documentation
+## API Documentation
 
 ### Base URL
 
@@ -646,7 +647,7 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 
 ---
 
-## 📝 Response Format
+## Response Format
 
 ### Success Response
 Semua response sukses pada aplikasi ini mengembalikan struktur seperti ini :
@@ -703,7 +704,7 @@ Bisa juga dengan detail error seperti ini :
 
 ---
 
-## 🧪 Testing with cURL
+## Testing with cURL
 
 ### 1. Register User
 
@@ -789,43 +790,91 @@ curl -X GET "http://localhost:8080/api/products?search=laptop" \
 ---
 
 ## 📮 Testing with Postman
-Tambahkan disini
+### Prerequisites
+- Install [Postman Desktop](https://www.postman.com/downloads/) atau gunakan [Postman Web](https://web.postman.com/)
+- Pastikan aplikasi API sudah running di `http://localhost:8080`
 
+
+### Import Postman Collection
+
+#### Method 1: Import dari File
+
+1. Download file JSON yang ada [disini](https://github.com/zulmy-azhary/go-restapi/blob/master/postman/go-rest-api.postman_collection.json)
+2. Buka Postman
+3. Pilih tab **File**
+4. Klik **Import...** di pojok kiri atas
+5. **Drag & drop** file atau klik **Choose Files**
+6. Klik **Import**
+
+#### Method 2: Import dari Url
+
+1. Buka Postman
+2. Pilih tab **File**
+3. Klik **Import...** di pojok kiri atas
+4. Masukkan url [ini](https://raw.githubusercontent.com/zulmy-azhary/go-restapi/refs/heads/master/postman/go-rest-api.postman_collection.json) di kolom input
+5. Klik **"Import"**
+
+Setelah import, Anda akan melihat struktur folder seperti ini:
+```
+📁 Go REST API - Complete Collection
+├── 📁 Health Check
+│   ├── GET Basic Health Check
+│   ├── GET Detailed Health Check
+│   └── GET Readiness Probe
+├── 📁 Authentication
+│   ├── POST Register User
+│   ├── POST Login
+│   └── GET Get Profile
+├── 📁 Products
+│   ├── POST Create Product
+│   ├── GET Get All Products
+│   ├── GET Get Products with Search
+│   ├── GET Get Product by ID
+│   ├── PUT Update Product
+│   └── DELETE Delete Product
+└── 📁 Test Scenarios
+    ├── POST Register Another User
+    ├── PUT Try Update Other User's Product (Should Fail)
+    ├── GET Try Access Without Token (Should Fail)
+    ├── POST Try Register with Duplicate Email (Should Fail)
+    ├── POST Try Register with Duplicate Username (Should Fail)
+    └── POST Try Login with Wrong Password (Should Fail)
+```
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ### Clean Architecture Pattern
 
 Aplikasi ini menggunakan clean architecture dengan pemisahan concern:
 
 ```
-┌─────────────────────────────────────────┐
-│           HTTP Layer (Fiber)            │
-│   ┌────────────────────────────────┐    │
-│   │         Handlers               │    │
-│   │  (HTTP Request/Response)       │    │
-│   └────────────┬───────────────────┘    │
-└────────────────┼────────────────────────┘
-                 │
-┌────────────────▼───────────────────────┐
+┌────────────────────────────────────────┐
+│           HTTP Layer (Fiber)           │
+│   ┌────────────────────────────────┐   │
+│   │            Handlers            │   │
+│   │    (HTTP Request/Response)     │   │
+│   └───────────────┬────────────────┘   │
+└───────────────────┼────────────────────┘
+                    │
+┌───────────────────▼────────────────────┐
 │          Business Logic Layer          │
 │   ┌────────────────────────────────┐   │
-│   │         Services               │   │
-│   │  (Business Rules & Logic)      │   │
-│   └────────────┬───────────────────┘   │
-└────────────────┼───────────────────────┘
-                 │
-┌────────────────▼───────────────────────┐
-│          Data Access Layer             │
+│   │            Services            │   │
+│   │    (Business Rules & Logic)    │   │
+│   └───────────────┬────────────────┘   │
+└───────────────────┼────────────────────┘
+                    │
+┌───────────────────▼────────────────────┐
+│            Data Access Layer           │
 │   ┌────────────────────────────────┐   │
-│   │       Repositories             │   │
-│   │  (Database Operations)         │   │
-│   └────────────┬───────────────────┘   │
-└────────────────┼───────────────────────┘
-                 │
-┌────────────────▼───────────────────────┐
-│            Database Layer              │
+│   │          Repositories          │   │
+│   │      (Database Operations)     │   │
+│   └───────────────┬────────────────┘   │
+└───────────────────┼────────────────────┘
+                    │
+┌───────────────────▼────────────────────┐
+│             Database Layer             │
 │   ┌────────────────────────────────┐   │
 │   │        PostgreSQL + GORM       │   │
 │   └────────────────────────────────┘   │
@@ -848,7 +897,7 @@ Aplikasi ini menggunakan clean architecture dengan pemisahan concern:
 
 ---
 
-## 🗄 Database Schema
+## Database Schema
 
 ### Users Table
 
@@ -910,7 +959,7 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 
 ---
 
-## 🔒 Security Features
+## Security Features
 
 ### 1. Password Security
 - Passwords di-hash menggunakan **bcrypt** dengan cost factor 10
@@ -935,7 +984,7 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 
 ---
 
-## 🚨 Error Handling
+## Error Handling
 
 ### HTTP Status Codes
 
@@ -975,7 +1024,7 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Database Connection Error
 
@@ -1025,7 +1074,7 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 
 ---
 
-## 📈 Performance Tips
+## Performance Tips
 
 ### 1. Database Indexing
 - Index sudah ditambahkan pada foreign keys
@@ -1046,7 +1095,7 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 ### Deploy ke Production
 
@@ -1092,7 +1141,7 @@ docker run -p 8080:8080 go-rest-api
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -1104,19 +1153,18 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
 ---
 
-## 📞 Support
+## Support
 
 Jika ada pertanyaan atau issues:
 
 1. Buka issue di GitHub repository
 2. Email: zulmyazhary32@gmail.com
-3. Documentation: [Link ke docs]
 
 ---
 
