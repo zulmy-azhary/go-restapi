@@ -1,0 +1,1123 @@
+# Go REST API
+
+REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fiber, GORM, dan PostgreSQL dengan clean architecture pattern.
+
+## 📋 Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Application](#running-the-application)
+- [API Documentation](#api-documentation)
+- [Response Format](#response-format)
+- [Testing with cURL](#testing-with-curl)
+- [Testing with Postman](#testing-with-postman)
+- [Architecture](#architecture)
+- [Database Schema](#database-schema)
+- [Contributing](#contributing)
+- [License](#license)
+
+## ✨ Features
+
+- ✅ **JWT Authentication** - Secure token-based authentication
+- ✅ **GORM ORM** - Auto migration, soft delete, associations
+- ✅ **Health Check** - 3 types of health check endpoints
+- ✅ **CRUD Operations** - Complete product management
+- ✅ **Pagination** - Built-in pagination support
+- ✅ **Search** - Case-insensitive search functionality
+- ✅ **Clean Architecture** - Repository, Service, Handler pattern
+- ✅ **Input Validation** - Request validation
+- ✅ **Error Handling** - Consistent error responses
+- ✅ **Password Hashing** - Bcrypt encryption
+- ✅ **Soft Delete** - Records aren't permanently deleted
+- ✅ **Authorization** - Users can only modify their own products
+- ✅ **CORS Enabled** - Cross-Origin Resource Sharing support
+- ✅ **Logging** - Request/Response logging middleware
+- ✅ **Recovery** - Panic recovery middleware
+
+## 🛠 Tech Stack
+
+- **Go** 1.25.1 - Programming language
+- **Fiber** v2.52.0 - Web framework
+- **GORM** v1.25.5 - ORM library
+- **PostgreSQL** - Primary database
+- **JWT** v5.2.0 - Authentication tokens
+- **Bcrypt** - Password hashing
+- **GoDotEnv** - Environment variable management
+
+## 📁 Project Structure
+
+```
+go-rest-api/
+├── cmd/
+│   └── api/
+│       └── main.go                 # Application entry point
+├── internal/
+│   ├── config/
+│   │   └── config.go               # Configuration management
+│   ├── database/
+│   │   └── database.go             # Database connection & migration
+│   ├── models/
+│   │   ├── user.go                 # User model
+│   │   └── product.go              # Product model
+│   ├── dto/
+│   │   ├── auth_dto.go             # Auth data transfer objects
+│   │   └── product_dto.go          # Product data transfer objects
+│   ├── repositories/
+│   │   ├── user_repository.go      # User data access layer
+│   │   └── product_repository.go   # Product data access layer
+│   ├── services/
+│   │   ├── auth_service.go         # Auth business logic
+│   │   └── product_service.go      # Product business logic
+│   ├── handlers/
+│   │   ├── auth_handler.go         # Auth HTTP handlers
+│   │   ├── product_handler.go      # Product HTTP handlers
+│   │   └── health_handler.go       # Health check handlers
+│   ├── middleware/
+│   │   └── auth_middleware.go      # JWT authentication middleware
+│   ├── routes/
+│   │   └── routes.go               # Route definitions
+│   └── utils/
+│       ├── jwt.go                  # JWT utilities
+│       ├── password.go             # Password hashing utilities
+│       └── response.go             # Response formatting utilities
+├── .env.example                     # Environment variables template
+├── .gitignore                       # Git ignore rules
+├── go.mod                           # Go module dependencies
+└── README.md                        # Project documentation
+```
+
+## 📋 Prerequisites
+
+Sebelum memulai, pastikan Anda telah menginstal:
+
+- **Go** ([Download](https://golang.org/dl/))
+- **PostgreSQL** 12 atau lebih tinggi ([Download](https://www.postgresql.org/download/))
+- **Git** ([Download](https://git-scm.com/downloads))
+- **Text Editor/IDE** (VS Code, GoLand, dll)
+
+## 🚀 Installation
+
+### 1. Clone Repository
+
+```bash
+git clone <repository-url>
+cd go-rest-api
+```
+
+### 2. Install Dependencies
+
+```bash
+go mod download
+```
+
+atau
+
+```bash
+go mod tidy
+```
+
+### 3. Setup Database
+
+Buat database PostgreSQL baru:
+
+```sql
+CREATE DATABASE go_rest_api;
+```
+
+Atau menggunakan psql command:
+
+```bash
+psql -U postgres
+CREATE DATABASE go_rest_api;
+\q
+```
+
+## ⚙️ Configuration
+
+### 1. Create Environment File
+
+Copy file `.env.example` ke `.env`:
+
+```bash
+cp .env.example .env
+```
+
+### 2. Update Environment Variables
+
+Edit file `.env` sesuai dengan konfigurasi Anda:
+
+```env
+# Server Configuration
+PORT=8080
+ENV=development
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password_here
+DB_NAME=go_rest_api
+DB_SSLMODE=disable
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this
+JWT_EXPIRE_MINUTES=1440
+```
+
+**⚠️ Penting:**
+- Ganti `DB_PASSWORD` dengan password PostgreSQL Anda
+- Ganti `JWT_SECRET` dengan key yang aman untuk production
+- Jangan commit file `.env` ke repository
+
+## 🏃 Running the Application
+
+### Development Mode
+
+```bash
+go run cmd/api/main.go
+```
+
+### Build dan Run
+
+```bash
+# Build aplikasi
+go build -o bin/api cmd/api/main.go
+
+# Run aplikasi
+./bin/api
+```
+
+### Build untuk Production
+
+```bash
+# Linux
+GOOS=linux GOARCH=amd64 go build -o bin/api-linux cmd/api/main.go
+
+# Windows
+GOOS=windows GOARCH=amd64 go build -o bin/api-windows.exe cmd/api/main.go
+
+# macOS
+GOOS=darwin GOARCH=amd64 go build -o bin/api-macos cmd/api/main.go
+```
+
+Server akan berjalan di: `http://localhost:8080`
+
+## 📚 API Documentation
+
+### Base URL
+
+```
+http://localhost:8080/api
+```
+
+### Endpoints Overview
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/health` | Basic health check | ❌ |
+| GET | `/health/detailed` | Detailed health check | ❌ |
+| GET | `/health/ready` | Readiness probe | ❌ |
+| POST | `/auth/register` | Register new user | ❌ |
+| POST | `/auth/login` | Login user | ❌ |
+| GET | `/auth/me` | Get user profile | ✅ |
+| POST | `/products` | Create product | ✅ |
+| GET | `/products` | Get all products | ✅ |
+| GET | `/products/:id` | Get product by ID | ✅ |
+| PUT | `/products/:id` | Update product | ✅ |
+| DELETE | `/products/:id` | Delete product | ✅ |
+
+---
+
+### Health Check Endpoints
+
+#### 1. Basic Health Check
+
+**GET** `/api/health`
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Server is running",
+  "data": {
+    "service": "go-rest-api",
+    "status": "ok",
+    "timestamp": "2025-12-17T13:03:55+08:00",
+    "version": "1.0.0"
+  },
+}
+```
+
+#### 2. Detailed Health Check
+
+**GET** `/api/health/detailed`
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Service is ready",
+  "data": {
+    "service": "go-rest-api",
+    "status": "ok",
+    "timestamp": "2025-12-17T13:05:21+08:00",
+    "version": "1.0.0",
+    "database": {
+      "status": "up",
+      "idle": 1,
+      "in_use": 0,
+      "max_open_conns": 0,
+      "open_conns": 1
+    }
+  }
+}
+```
+
+#### 3. Readiness Probe
+
+**GET** `/api/health/ready`
+
+**Response:**
+```json
+{
+  "ready": true
+}
+```
+
+---
+
+### Authentication Endpoints
+
+#### 1. Register
+
+**POST** `/api/auth/register`
+
+**Request Body:**
+```json
+{
+  "email": "john.doe@example.com",
+  "username": "johndoe",
+  "password": "password123",
+  "name": "John Doe"
+}
+```
+
+**Validation Rules:**
+- `email`: required, valid email format
+- `username`: required, minimum 3 characters, unique
+- `password`: required, minimum 6 characters
+- `name`: required, minimum 3 characters
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "email": "john.doe@example.com",
+      "username": "johndoe",
+      "name": "John Doe",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    }
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "username already registered"
+}
+```
+
+#### 2. Login
+
+**POST** `/api/auth/login`
+
+**Request Body:**
+```json
+{
+  "username": "johndoe",
+  "password": "password123"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "email": "john.doe@example.com",
+      "username": "johndoe",
+      "name": "John Doe",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    }
+  }
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "success": false,
+  "message": "invalid credentials"
+}
+```
+
+#### 3. Get Profile
+
+**GET** `/api/auth/me`
+
+**Headers:**
+```
+Authorization: Bearer <YOUR_JWT_TOKEN>
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Profile retrieved",
+  "data": {
+    "id": 1,
+    "email": "john.doe@example.com",
+    "username": "johndoe",
+    "name": "John Doe",
+    "created_at": "2024-01-15T10:30:00Z",
+    "updated_at": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "success": false,
+  "message": "Invalid or expired token"
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "success": false,
+  "message": "user not found"
+}
+```
+
+---
+
+### Product Endpoints
+
+**⚠️ Note:** Semua endpoint product memerlukan JWT token dalam header:
+```
+Authorization: Bearer <YOUR_JWT_TOKEN>
+```
+
+#### 1. Create Product
+
+**POST** `/api/products`
+
+**Headers:**
+```
+Authorization: Bearer <YOUR_JWT_TOKEN>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Laptop Gaming",
+  "description": "High-end gaming laptop with RTX 4090",
+  "price": 25000000,
+  "stock": 15
+}
+```
+
+**Validation Rules:**
+- `name`: required, minimum 3 characters
+- `description`: optional
+- `price`: required, must be greater than 0
+- `stock`: required, must be greater than or equal to 0
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Product created successfully",
+  "data": {
+    "id": 1,
+    "name": "Laptop Gaming",
+    "description": "High-end gaming laptop with RTX 4090",
+    "price": 25000000,
+    "stock": 15,
+    "created_by": 1,
+    "user": {
+      "id": 1,
+      "email": "john.doe@example.com",
+      "username": "johndoe",
+      "name": "John Doe",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    },
+    "created_at": "2024-01-15T11:00:00Z",
+    "updated_at": "2024-01-15T11:00:00Z"
+  }
+}
+```
+
+#### 2. Get All Products
+
+**GET** `/api/products?page=1&perPage=10&search=laptop`
+
+**Query Parameters:**
+- `page` (optional): Page number, default = 1
+- `perPage` (optional): Items per page, default = 10
+- `search` (optional): Search by product name (case-insensitive)
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Products retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "name": "Laptop Gaming",
+      "description": "High-end gaming laptop with RTX 4090",
+      "price": 25000000,
+      "stock": 15,
+      "created_by": 1,
+      "user": {
+        "id": 1,
+        "email": "john.doe@example.com",
+        "username": "johndoe",
+        "name": "John Doe",
+        "created_at": "2024-01-15T10:30:00Z",
+        "updated_at": "2024-01-15T10:30:00Z"
+      },
+      "created_at": "2024-01-15T11:00:00Z",
+      "updated_at": "2024-01-15T11:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 10,
+    "total": 1,
+    "total_pages": 1
+  }
+}
+```
+
+#### 3. Get Product by ID
+
+**GET** `/api/products/:id`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Product retrieved successfully",
+  "data": {
+    "id": 1,
+    "name": "Laptop Gaming",
+    "description": "High-end gaming laptop with RTX 4090",
+    "price": 25000000,
+    "stock": 15,
+    "created_by": 1,
+    "user": {
+      "id": 1,
+      "email": "john.doe@example.com",
+      "username": "johndoe",
+      "name": "John Doe",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    },
+    "created_at": "2024-01-15T11:00:00Z",
+    "updated_at": "2024-01-15T11:00:00Z"
+  }
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "success": false,
+  "message": "product not found"
+}
+```
+
+#### 4. Update Product
+
+**PUT** `/api/products/:id`
+
+**Headers:**
+```
+Authorization: Bearer <YOUR_JWT_TOKEN>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Laptop Gaming Pro",
+  "description": "Updated description",
+  "price": 27000000,
+  "stock": 20
+}
+```
+
+**Note:** Semua field bersifat optional. Hanya field yang dikirim yang akan diupdate.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Product updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Laptop Gaming Pro",
+    "description": "Updated description",
+    "price": 27000000,
+    "stock": 20,
+    "created_by": 1,
+    "user": {
+      "id": 1,
+      "email": "john.doe@example.com",
+      "username": "johndoe",
+      "name": "John Doe",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    },
+    "created_at": "2024-01-15T11:00:00Z",
+    "updated_at": "2024-01-15T12:00:00Z"
+  }
+}
+```
+
+**Error Response (403):**
+```json
+{
+  "success": false,
+  "message": "unauthorized to update this product"
+}
+```
+
+#### 5. Delete Product
+
+**DELETE** `/api/products/:id`
+
+**Headers:**
+```
+Authorization: Bearer <YOUR_JWT_TOKEN>
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Product deleted successfully"
+}
+```
+
+**Error Response (403):**
+```json
+{
+  "success": false,
+  "message": "unauthorized to delete this product"
+}
+```
+
+**Note:** Ini adalah soft delete, data tidak benar-benar dihapus dari database.
+
+---
+
+## 📝 Response Format
+
+### Success Response
+Semua response sukses pada aplikasi ini mengembalikan struktur seperti ini :
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { ... }
+}
+```
+Atau bisa juga tanpa mengembalikan `data`, seperti ini :
+```json
+{
+  "success": true,
+  "message": "Operation successful"
+}
+```
+
+### Error Response
+Semua response error pada aplikasi ini mengembalikan struktur json seperti ini :
+```json
+{
+  "success": false,
+  "message": "Error message here",
+}
+```
+Bisa juga dengan detail error seperti ini :
+```json
+{
+  "success": false,
+  "message": "Error message here",
+  "error": {
+    "code": 400,
+    "type": "BAD_REQUEST"
+  }
+}
+```
+
+### Paginated Response
+
+```json
+{
+  "success": true,
+  "message": "Data retrieved successfully",
+  "data": [ ... ],
+  "pagination": {
+    "page": 1,
+    "per_page": 10,
+    "total": 100,
+    "total_pages": 10
+  }
+}
+```
+
+---
+
+## 🧪 Testing with cURL
+
+### 1. Register User
+
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@example.com",
+    "username": "johndoe",
+    "password": "password123",
+    "name": "John Doe"
+  }'
+```
+
+### 2. Login
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "password": "password123"
+  }'
+```
+
+**Save the token from response!**
+
+### 3. Create Product
+
+```bash
+curl -X POST http://localhost:8080/api/products \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <YOUR_TOKEN_HERE>" \
+  -d '{
+    "name": "Laptop Gaming",
+    "description": "High-end gaming laptop",
+    "price": 25000000,
+    "stock": 15
+  }'
+```
+
+### 4. Get All Products
+
+```bash
+curl -X GET "http://localhost:8080/api/products?page=1&perPage=10" \
+  -H "Authorization: Bearer <YOUR_TOKEN_HERE>"
+```
+
+### 5. Get Product by ID
+
+```bash
+curl -X GET http://localhost:8080/api/products/1 \
+  -H "Authorization: Bearer <YOUR_TOKEN_HERE>"
+```
+
+### 6. Update Product
+
+```bash
+curl -X PUT http://localhost:8080/api/products/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <YOUR_TOKEN_HERE>" \
+  -d '{
+    "name": "Updated Laptop Gaming",
+    "price": 27000000,
+    "stock": 20
+  }'
+```
+
+### 7. Delete Product
+
+```bash
+curl -X DELETE http://localhost:8080/api/products/1 \
+  -H "Authorization: Bearer <YOUR_TOKEN_HERE>"
+```
+
+### 8. Search Products
+
+```bash
+curl -X GET "http://localhost:8080/api/products?search=laptop" \
+  -H "Authorization: Bearer <YOUR_TOKEN_HERE>"
+```
+
+---
+
+## 📮 Testing with Postman
+Tambahkan disini
+
+---
+
+## 🏗 Architecture
+
+### Clean Architecture Pattern
+
+Aplikasi ini menggunakan clean architecture dengan pemisahan concern:
+
+```
+┌─────────────────────────────────────────┐
+│           HTTP Layer (Fiber)            │
+│   ┌────────────────────────────────┐    │
+│   │         Handlers               │    │
+│   │  (HTTP Request/Response)       │    │
+│   └────────────┬───────────────────┘    │
+└────────────────┼────────────────────────┘
+                 │
+┌────────────────▼───────────────────────┐
+│          Business Logic Layer          │
+│   ┌────────────────────────────────┐   │
+│   │         Services               │   │
+│   │  (Business Rules & Logic)      │   │
+│   └────────────┬───────────────────┘   │
+└────────────────┼───────────────────────┘
+                 │
+┌────────────────▼───────────────────────┐
+│          Data Access Layer             │
+│   ┌────────────────────────────────┐   │
+│   │       Repositories             │   │
+│   │  (Database Operations)         │   │
+│   └────────────┬───────────────────┘   │
+└────────────────┼───────────────────────┘
+                 │
+┌────────────────▼───────────────────────┐
+│            Database Layer              │
+│   ┌────────────────────────────────┐   │
+│   │        PostgreSQL + GORM       │   │
+│   └────────────────────────────────┘   │
+└────────────────────────────────────────┘
+```
+
+### Layer Responsibilities
+
+1. **Handlers**: Menerima HTTP request, validasi input, memanggil service, mengembalikan response
+2. **Services**: Business logic, validasi business rules, orchestration
+3. **Repositories**: Data access, query database, CRUD operations
+4. **Models**: Database entities dan schema
+
+### Advantages
+
+- ✅ **Testability**: Setiap layer bisa ditest secara independen
+- ✅ **Maintainability**: Mudah untuk maintain dan modify
+- ✅ **Scalability**: Mudah untuk scale dan extend
+- ✅ **Flexibility**: Mudah mengganti implementasi (misal: ganti database)
+
+---
+
+## 🗄 Database Schema
+
+### Users Table
+
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL
+);
+
+CREATE INDEX idx_users_deleted_at ON users(deleted_at);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_username ON users(username);
+```
+
+### Products Table
+
+```sql
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(15, 2) NOT NULL,
+    stock INTEGER NOT NULL DEFAULT 0,
+    created_by INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_products_deleted_at ON products(deleted_at);
+CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_products_created_by ON products(created_by);
+```
+
+### Entity Relationship
+
+```
+┌─────────────────┐          ┌─────────────────┐
+│     Users       │          │    Products     │
+├─────────────────┤          ├─────────────────┤
+│ id (PK)         │◄────────┐│ id (PK)         │
+│ email           │         ││ name            │
+│ username        │         ││ description     │
+│ password        │         ││ price           │
+│ name            │         ││ stock           │
+│ created_at      │         └│ created_by (FK) │
+│ updated_at      │          │ created_at      │
+│ deleted_at      │          │ updated_at      │
+└─────────────────┘          │ deleted_at      │
+                             └─────────────────┘
+```
+
+---
+
+## 🔒 Security Features
+
+### 1. Password Security
+- Passwords di-hash menggunakan **bcrypt** dengan cost factor 10
+- Password tidak pernah ditampilkan dalam response JSON
+
+### 2. JWT Authentication
+- Token expires dalam 24 jam (configurable)
+- Token menggunakan HS256 signing method
+- Secret key harus diganti untuk production
+
+### 3. Authorization
+- User hanya bisa update/delete product yang mereka buat sendiri
+- Middleware memverifikasi token di setiap protected route
+
+### 4. SQL Injection Prevention
+- GORM menggunakan prepared statements
+- Parameter binding otomatis
+
+### 5. CORS
+- CORS enabled dengan konfigurasi yang bisa disesuaikan
+- Default: allow all origins (untuk development)
+
+---
+
+## 🚨 Error Handling
+
+### HTTP Status Codes
+
+- `200 OK`: Request berhasil
+- `201 Created`: Resource berhasil dibuat
+- `400 Bad Request`: Request body invalid atau validation error
+- `401 Unauthorized`: Authentication failed atau token invalid
+- `403 Forbidden`: User tidak memiliki akses
+- `404 Not Found`: Resource tidak ditemukan
+- `500 Internal Server Error`: Server error
+
+### Common Errors
+
+#### 1. Missing Authorization Header
+```json
+{
+  "success": false,
+  "message": "Missing authorization header"
+}
+```
+
+#### 2. Invalid Token
+```json
+{
+  "success": false,
+  "message": "Invalid or expired token"
+}
+```
+
+#### 3. Validation Error
+```json
+{
+  "success": false,
+  "message": "Invalid request body"
+}
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Database Connection Error
+
+**Error:** `failed to connect to database`
+
+**Solution:**
+1. Pastikan PostgreSQL running
+2. Check credentials di file `.env`
+3. Pastikan database sudah dibuat
+4. Test koneksi: `psql -U postgres -d go_rest_api`
+
+### Port Already in Use
+
+**Error:** `bind: address already in use`
+
+**Solution:**
+1. Change port di `.env`: `PORT=8081`
+2. Atau kill process yang menggunakan port:
+   ```bash
+   # Linux/Mac
+   lsof -ti:8080 | xargs kill -9
+   
+   # Windows
+   netstat -ano | findstr :8080
+   taskkill /PID <PID> /F
+   ```
+
+### Migration Error
+
+**Error:** `failed to migrate database`
+
+**Solution:**
+1. Drop existing tables:
+   ```sql
+   DROP TABLE products;
+   DROP TABLE users;
+   ```
+2. Restart aplikasi
+
+### Token Expired
+
+**Error:** `Invalid or expired token`
+
+**Solution:**
+1. Login ulang untuk mendapatkan token baru
+2. Token valid selama 24 jam
+
+---
+
+## 📈 Performance Tips
+
+### 1. Database Indexing
+- Index sudah ditambahkan pada foreign keys
+- Index pada `deleted_at` untuk soft delete queries
+- Index pada `email` untuk faster login
+
+### 2. Pagination
+- Selalu gunakan pagination untuk list queries
+- Default limit: 10, max recommended: 100
+
+### 3. Connection Pooling
+- GORM menggunakan connection pooling secara default
+- Bisa dikonfigurasi di `database.go`
+
+### 4. Caching (Optional)
+- Tambahkan Redis untuk caching frequent queries
+- Cache JWT token validation results
+
+---
+
+## 🚀 Deployment
+
+### Deploy ke Production
+
+1. **Build aplikasi:**
+   ```bash
+   CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/api/main.go
+   ```
+
+2. **Setup environment variables**
+
+3. **Run migrations**
+
+4. **Start aplikasi:**
+   ```bash
+   ./main
+   ```
+
+### Docker Deployment (Optional)
+
+**Dockerfile:**
+```dockerfile
+FROM golang:1.25.1-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/api/main.go
+
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=builder /app/main .
+COPY --from=builder /app/.env .
+EXPOSE 8080
+CMD ["./main"]
+```
+
+**Build & Run:**
+```bash
+docker build -t go-rest-api .
+docker run -p 8080:8080 go-rest-api
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 📞 Support
+
+Jika ada pertanyaan atau issues:
+
+1. Buka issue di GitHub repository
+2. Email: zulmyazhary32@gmail.com
+3. Documentation: [Link ke docs]
+
+---
+
+**Built with ❤️ using Go, Fiber, GORM, and PostgreSQL**
