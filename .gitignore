@@ -1,0 +1,175 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Build output directory
+bin/
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# But keep the example file
+!.env.example
+
+# IDE - VSCode
+.vscode/
+*.code-workspace
+
+# IDE - IntelliJ IDEA / GoLand
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# IDE - Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# IDE - Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# IDE - Emacs
+*~
+\#*\#
+.\#*
+
+# OS - macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# OS - Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# OS - Linux
+*~
+.directory
+.Trash-*
+
+# Logs
+*.log
+logs/
+log/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Test coverage
+coverage.txt
+coverage.out
+coverage.html
+*.coverprofile
+
+# Profiling data
+*.prof
+cpu.prof
+mem.prof
+*.pprof
+
+# Air - Live reload tool
+.air.toml
+tmp/
+
+# Delve debugger
+__debug_bin
+
+# Output of go build
+main
+go-rest-api
+
+# Frontend build (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled Object files
+*.o
+*.a
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Documentation build
+docs/_build/
+site/
+
+# SSL certificates (never commit these!)
+*.pem
+*.key
+*.crt
+*.cer
+
+# Docker
+.dockerignore
+
+# Kubernetes
+*.kubeconfig
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Local configuration
+config.local.yaml
+config.local.json
+
+# Migration files with sensitive data
+migrations/*_data.sql
+
+# Vendor directory (if using dep)
+vendor/
+
+# GoReleaser
+dist/
+*.snap
+
+# Crash log files
+crash.log
+panic.log
