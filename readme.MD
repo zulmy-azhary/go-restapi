@@ -789,7 +789,7 @@ curl -X GET "http://localhost:8080/api/products?search=laptop" \
 
 ---
 
-## 📮 Testing with Postman
+## Testing with Postman
 ### Prerequisites
 - Install [Postman Desktop](https://www.postman.com/downloads/) atau gunakan [Postman Web](https://web.postman.com/)
 - Pastikan aplikasi API sudah running di `http://localhost:8080`
