@@ -1,6 +1,6 @@
 # Go REST API
 
-REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fiber, GORM, dan PostgreSQL dengan clean architecture pattern.
+Complete REST API with JWT authentication and product CRUD using Go, Fiber, GORM, and PostgreSQL with clean architecture pattern.
 
 ## Table of Contents
 
@@ -19,6 +19,7 @@ REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fibe
 - [Database Schema](#database-schema)
 - [Contributing](#contributing)
 - [License](#license)
+- [Support](#support)
 
 ## Features
 
@@ -40,11 +41,11 @@ REST API lengkap dengan authentication JWT dan CRUD product menggunakan Go, Fibe
 
 ## Tech Stack
 
-- **Go** 1.25.1 - Programming language
-- **Fiber** v2.52.0 - Web framework
-- **GORM** v1.25.5 - ORM library
-- **PostgreSQL** - Primary database
-- **JWT** v5.2.0 - Authentication tokens
+- **Go** - Programming language
+- **Fiber** - Web framework
+- **GORM** - ORM library
+- **PostgreSQL** - Database
+- **JWT** - Authentication tokens
 - **Bcrypt** - Password hashing
 - **GoDotEnv** - Environment variable management
 
@@ -85,6 +86,8 @@ go-rest-api/
 │       ├── jwt.go                  # JWT utilities
 │       ├── password.go             # Password hashing utilities
 │       └── response.go             # Response formatting utilities
+├── postman/
+│   └── go-rest-api.postman_collection.json
 ├── .env.example                    # Environment variables template
 ├── .gitignore                      # Git ignore rules
 ├── go.mod                          # Go module dependencies
@@ -93,12 +96,12 @@ go-rest-api/
 
 ## Prerequisites
 
-Sebelum memulai, pastikan Anda telah menginstal:
+Before starting, make sure you have installed:
 
 - **Go** ([Download](https://golang.org/dl/))
-- **PostgreSQL** 12 atau lebih tinggi ([Download](https://www.postgresql.org/download/))
+- **PostgreSQL** 12 or higher ([Download](https://www.postgresql.org/download/))
 - **Git** ([Download](https://git-scm.com/downloads))
-- **Text Editor/IDE** (VS Code, GoLand, dll)
+- **Text Editor/IDE** (VS Code, GoLand, etc)
 
 ## Installation
 
@@ -115,7 +118,7 @@ cd go-rest-api
 go mod download
 ```
 
-atau
+or
 
 ```bash
 go mod tidy
@@ -123,13 +126,13 @@ go mod tidy
 
 ### 3. Setup Database
 
-Buat database PostgreSQL baru:
+Create a new PostgreSQL database:
 
 ```sql
 CREATE DATABASE go_rest_api;
 ```
 
-Atau menggunakan psql command:
+Or using psql command:
 
 ```bash
 psql -U postgres
@@ -149,7 +152,7 @@ cp .env.example .env
 
 ### 2. Update Environment Variables
 
-Edit file `.env` sesuai dengan konfigurasi Anda:
+Edit file `.env` file according to your configuration:
 
 ```env
 # Server Configuration
@@ -169,10 +172,10 @@ JWT_SECRET=your-super-secret-jwt-key-change-this
 JWT_EXPIRE_MINUTES=1440
 ```
 
-**⚠️ Penting:**
-- Ganti `DB_PASSWORD` dengan password PostgreSQL Anda
-- Ganti `JWT_SECRET` dengan key yang aman untuk production
-- Jangan commit file `.env` ke repository
+**⚠️ Important:**
+- Replace `DB_PASSWORD` with your PostgreSQL password
+- Replace `JWT_SECRET` with a secure key for production
+- Do not commit the `.env` file to the repository
 
 ## Running the Application
 
@@ -182,7 +185,7 @@ JWT_EXPIRE_MINUTES=1440
 go run cmd/api/main.go
 ```
 
-### Build dan Run
+### Build and Run
 
 ```bash
 # Build aplikasi
@@ -192,7 +195,7 @@ go build -o bin/api cmd/api/main.go
 ./bin/api
 ```
 
-### Build untuk Production
+### Build for Production
 
 ```bash
 # Linux
@@ -205,7 +208,7 @@ GOOS=windows GOARCH=amd64 go build -o bin/api-windows.exe cmd/api/main.go
 GOOS=darwin GOARCH=amd64 go build -o bin/api-macos cmd/api/main.go
 ```
 
-Server akan berjalan di: `http://localhost:8080`
+The server will run at: `http://localhost:8080`
 
 ## API Documentation
 
@@ -424,7 +427,7 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 
 ### Product Endpoints
 
-**⚠️ Note:** Semua endpoint product memerlukan JWT token dalam header:
+**⚠️ Note:** All product endpoints require JWT token in the header:
 ```
 Authorization: Bearer <YOUR_JWT_TOKEN>
 ```
@@ -582,7 +585,7 @@ Content-Type: application/json
 }
 ```
 
-**Note:** Semua field bersifat optional. Hanya field yang dikirim yang akan diupdate.
+**Note:** All fields are optional. Only the sent fields will be updated.
 
 **Success Response (200):**
 ```json
@@ -643,14 +646,14 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 }
 ```
 
-**Note:** Ini adalah soft delete, data tidak benar-benar dihapus dari database.
+**Note:** This is a soft delete, data is not actually deleted from the database.
 
 ---
 
 ## Response Format
 
 ### Success Response
-Semua response sukses pada aplikasi ini mengembalikan struktur seperti ini :
+All successful responses in this application return a structure like this:
 ```json
 {
   "success": true,
@@ -658,7 +661,7 @@ Semua response sukses pada aplikasi ini mengembalikan struktur seperti ini :
   "data": { ... }
 }
 ```
-Atau bisa juga tanpa mengembalikan `data`, seperti ini :
+Or it can also be without returning `data`, like this :
 ```json
 {
   "success": true,
@@ -667,14 +670,14 @@ Atau bisa juga tanpa mengembalikan `data`, seperti ini :
 ```
 
 ### Error Response
-Semua response error pada aplikasi ini mengembalikan struktur json seperti ini :
+All error responses in this application return a JSON structure like this:
 ```json
 {
   "success": false,
   "message": "Error message here",
 }
 ```
-Bisa juga dengan detail error seperti ini :
+Can also include error details like this:
 ```json
 {
   "success": false,
@@ -791,30 +794,30 @@ curl -X GET "http://localhost:8080/api/products?search=laptop" \
 
 ## Testing with Postman
 ### Prerequisites
-- Install [Postman Desktop](https://www.postman.com/downloads/) atau gunakan [Postman Web](https://web.postman.com/)
-- Pastikan aplikasi API sudah running di `http://localhost:8080`
+- Install [Postman Desktop](https://www.postman.com/downloads/) or use [Postman Web](https://web.postman.com/)
+- Ensure the API application is running at `http://localhost:8080`
 
 
 ### Import Postman Collection
 
 #### Method 1: Import dari File
 
-1. Download file JSON yang ada [disini](https://github.com/zulmy-azhary/go-restapi/blob/master/postman/go-rest-api.postman_collection.json)
-2. Buka Postman
-3. Pilih tab **File**
-4. Klik **Import...** di pojok kiri atas
-5. **Drag & drop** file atau klik **Choose Files**
-6. Klik **Import**
+1. Download the JSON file available [here](https://github.com/zulmy-azhary/go-restapi/blob/master/postman/go-rest-api.postman_collection.json)
+2. Open Postman
+3. Select the **File** tab
+4. Click **Import...** in the top left corner
+5. **Drag & drop** the file or click **Choose Files**
+6. Click **Import**
 
 #### Method 2: Import dari Url
 
-1. Buka Postman
-2. Pilih tab **File**
-3. Klik **Import...** di pojok kiri atas
-4. Masukkan url [ini](https://raw.githubusercontent.com/zulmy-azhary/go-restapi/refs/heads/master/postman/go-rest-api.postman_collection.json) di kolom input
-5. Klik **"Import"**
+1. Open Postman
+2. Select the **File** tab
+3. Click **Import...** in the top left corner
+4. Enter this [URL](https://raw.githubusercontent.com/zulmy-azhary/go-restapi/refs/heads/master/postman/go-rest-api.postman_collection.json) in the input field
+5. Click **Import**
 
-Setelah import, Anda akan melihat struktur folder seperti ini:
+After importing, you will see a folder structure like this:
 ```
 📁 Go REST API - Complete Collection
 ├── 📁 Health Check
@@ -846,7 +849,7 @@ Setelah import, Anda akan melihat struktur folder seperti ini:
 
 ### Clean Architecture Pattern
 
-Aplikasi ini menggunakan clean architecture dengan pemisahan concern:
+This application uses clean architecture with separation of concerns:
 
 ```
 ┌────────────────────────────────────────┐
@@ -883,17 +886,17 @@ Aplikasi ini menggunakan clean architecture dengan pemisahan concern:
 
 ### Layer Responsibilities
 
-1. **Handlers**: Menerima HTTP request, validasi input, memanggil service, mengembalikan response
-2. **Services**: Business logic, validasi business rules, orchestration
+1. **Handlers**: Receive HTTP requests, validate input, call services, return responses
+2. **Services**: Business logic, validate business rules, orchestration
 3. **Repositories**: Data access, query database, CRUD operations
 4. **Models**: Database entities dan schema
 
 ### Advantages
 
-- ✅ **Testability**: Setiap layer bisa ditest secara independen
-- ✅ **Maintainability**: Mudah untuk maintain dan modify
-- ✅ **Scalability**: Mudah untuk scale dan extend
-- ✅ **Flexibility**: Mudah mengganti implementasi (misal: ganti database)
+- ✅ **Testability**: Each layer can be tested independently
+- ✅ **Maintainability**: Easy to maintain and modify
+- ✅ **Scalability**: Easy to scale and extend
+- ✅ **Flexibility**: Easy to change implementation (e.g., change database)
 
 ---
 
@@ -962,25 +965,25 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 ## Security Features
 
 ### 1. Password Security
-- Passwords di-hash menggunakan **bcrypt** dengan cost factor 10
-- Password tidak pernah ditampilkan dalam response JSON
+- Passwords are hashed using **bcrypt** with cost factor 10
+- Passwords are never displayed in JSON responses
 
 ### 2. JWT Authentication
-- Token expires dalam 24 jam (configurable)
-- Token menggunakan HS256 signing method
-- Secret key harus diganti untuk production
+- Token expires in 24 hours (configurable)
+- Token uses HS256 signing method
+- Secret key must be changed for production
 
 ### 3. Authorization
-- User hanya bisa update/delete product yang mereka buat sendiri
-- Middleware memverifikasi token di setiap protected route
+- Users can only update/delete products they created
+- Middleware verifies token on every protected route
 
 ### 4. SQL Injection Prevention
-- GORM menggunakan prepared statements
-- Parameter binding otomatis
+- GORM uses prepared statements
+- Automatic parameter binding
 
 ### 5. CORS
-- CORS enabled dengan konfigurasi yang bisa disesuaikan
-- Default: allow all origins (untuk development)
+- CORS enabled with customizable configuration
+- Default: allow all origins (for development)
 
 ---
 
@@ -988,12 +991,12 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 
 ### HTTP Status Codes
 
-- `200 OK`: Request berhasil
-- `201 Created`: Resource berhasil dibuat
-- `400 Bad Request`: Request body invalid atau validation error
-- `401 Unauthorized`: Authentication failed atau token invalid
-- `403 Forbidden`: User tidak memiliki akses
-- `404 Not Found`: Resource tidak ditemukan
+- `200 OK`: Request successful
+- `201 Created`: Resource successfully created
+- `400 Bad Request`: Invalid request body or validation error
+- `401 Unauthorized`: Authentication failed or invalid token
+- `403 Forbidden`: User does not have access
+- `404 Not Found`: Resource not found
 - `500 Internal Server Error`: Server error
 
 ### Common Errors
@@ -1031,18 +1034,18 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 **Error:** `failed to connect to database`
 
 **Solution:**
-1. Pastikan PostgreSQL running
-2. Check credentials di file `.env`
-3. Pastikan database sudah dibuat
-4. Test koneksi: `psql -U postgres -d go_rest_api`
+1. Ensure PostgreSQL is running
+2. Check credentials in `.env` file
+3. Ensure database has been created
+4. Test connection: `psql -U postgres -d go_rest_api`
 
 ### Port Already in Use
 
 **Error:** `bind: address already in use`
 
 **Solution:**
-1. Change port di `.env`: `PORT=8081`
-2. Atau kill process yang menggunakan port:
+1. Change port in `.env`: `PORT=8081`
+2. Or kill the process using the port:
    ```bash
    # Linux/Mac
    lsof -ti:8080 | xargs kill -9
@@ -1062,44 +1065,44 @@ CREATE INDEX idx_products_created_by ON products(created_by);
    DROP TABLE products;
    DROP TABLE users;
    ```
-2. Restart aplikasi
+2. Restart application
 
 ### Token Expired
 
 **Error:** `Invalid or expired token`
 
 **Solution:**
-1. Login ulang untuk mendapatkan token baru
-2. Token valid selama 24 jam
+1. Login again to get a new token
+2. Token is valid for 24 hours
 
 ---
 
 ## Performance Tips
 
 ### 1. Database Indexing
-- Index sudah ditambahkan pada foreign keys
-- Index pada `deleted_at` untuk soft delete queries
-- Index pada `email` untuk faster login
+- Indexes already added on foreign keys
+- Index on `deleted_at` for soft delete queries
+- Index on `email` for faster login
 
 ### 2. Pagination
-- Selalu gunakan pagination untuk list queries
-- Default limit: 10, max recommended: 100
+- Always use pagination for list queries
+- Default per page: 10, max recommended: 100
 
 ### 3. Connection Pooling
-- GORM menggunakan connection pooling secara default
-- Bisa dikonfigurasi di `database.go`
+- GORM uses connection pooling by default
+- Can be configured in `database.go`
 
 ### 4. Caching (Optional)
-- Tambahkan Redis untuk caching frequent queries
+- Add Redis for caching frequent queries
 - Cache JWT token validation results
 
 ---
 
 ## Deployment
 
-### Deploy ke Production
+### Deploy to Production
 
-1. **Build aplikasi:**
+1. **Build the application:**
    ```bash
    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/api/main.go
    ```
@@ -1108,7 +1111,7 @@ CREATE INDEX idx_products_created_by ON products(created_by);
 
 3. **Run migrations**
 
-4. **Start aplikasi:**
+4. **Start the application:**
    ```bash
    ./main
    ```
@@ -1161,9 +1164,9 @@ This project is licensed under the MIT License.
 
 ## Support
 
-Jika ada pertanyaan atau issues:
+If you have any questions or issues:
 
-1. Buka issue di GitHub repository
+1. Open an issue on the GitHub repository
 2. Email: zulmyazhary32@gmail.com
 
 ---
